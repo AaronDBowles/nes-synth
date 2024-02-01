@@ -1,5 +1,5 @@
-.export ReadController
-.segment "CODE"
+
+.scope ReadController
 
 .proc ReadController
 
@@ -19,3 +19,4 @@ read_button:
 
     rts
 .endproc
+.endscope

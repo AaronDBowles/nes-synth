@@ -1,10 +1,13 @@
-.export Main
-.segment "CODE"
+.scope Main
+
+.include "free_synth.s"
+
 
 .proc Main
     
     ;eventually add mode selection here
-    jsr FreeSynth
+    jsr FreeSynth::FreeSynth
     rts
 
 .endproc
+.endscope

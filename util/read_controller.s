@@ -2,7 +2,9 @@
 .scope ReadController
 
 .proc ReadController
-
+    ;load previously captured controller input into $21 to for change detection purposes if we need to compare
+    lda $20
+    sta $21
     lda #1
     sta $20
 
@@ -16,6 +18,9 @@ read_button:
     lsr a
     rol $20
     bcc read_button
+
+    lda $20
+    sta $21
 
     rts
 .endproc

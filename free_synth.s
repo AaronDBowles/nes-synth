@@ -28,13 +28,22 @@
         beq change_channel
 
     play_sound:
-        
+        ;for testing just play pulse
+        lda #%00001111
+        sta $4015
+        lda #%11111100
+        sta $4000
+        lda #%0001111
+        sta $4002
+        lda #%1111011
+        sta $4003
+
         ;determine channel
-        lda $00
+        
 
 
         
-        bne free_synth
+        ;bne free_synth
 
         rts
 

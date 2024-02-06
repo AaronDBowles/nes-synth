@@ -6,7 +6,7 @@
 .proc Main
     
     ;eventually add mode selection here
-    jsr FreeSynth::init
+    jsr FreeSynth::loop
     rts
 
 .endproc

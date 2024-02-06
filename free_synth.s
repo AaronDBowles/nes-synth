@@ -2,73 +2,63 @@
 
 .include "util/read_controller.s"
 
-;zero page $0000 to $00FF
-;nes ram is $0000 to $07FF
-;A B Select Start Up Down Left Right
-    .proc init
-        ;initialize player1 channel selection byte
-        lda #0
-        sta $22
-        ;initialize player1 sound byte
-        lda #0
-        sta $23
-        jsr loop
-    .endproc
+PLAYER1_CHAN = $22
+PLAYER1_SOUND = $23
 
     .proc loop
     free_synth:
-        ;store controller in $20, previous controller capture in $21
-        jsr ReadController::ReadController
+        jsr Joypad::update
         
     parse_inputs:
-        ;check if inputs have even changed
-        lda $20
-        cmp $21
-        ;if they havent changed, go back to top, nothing to do here
-        beq free_synth
         ;determine if channel is being incremented with B press
-        lda #%01000000
-        and $20
-        cmp #%01000000
-        ;if so, increment $22 to increase channel selection
-        beq change_channel
+        lda Joypad::pressed
+        and #BUTTON_B
+        bne change_channel
+        ;if A, play sound
+        ; lda #%10000000
+        ; and CONTROLLER1_INPUT
+        ; cmp #%10000000
+        ; beq play_sound
 
-    play_sound:
-        ;determine channel
-        lda #0
-        cmp $22
-        beq play_pulse1
-        lda #1
-        cmp $22
-        beq play_pulse2
-        lda #2
-        cmp $22
-        beq play_tri
-        lda #3
-        cmp $22
-        beq play_noise
-        lda #4
-        cmp $22
-        beq play_dmc
-
-        jsr loop
+        rts
+    
 
     .endproc
 
-    .proc change_channel
-        ;increment $22 to increase channel selection
-        ldx $22
-        inx
-        stx $22
-        lda #5
-        cmp $22
-        beq reset_channel
-        jsr loop 
+    .proc play_sound
+        ;determine channel
+        lda #0
+        cmp PLAYER1_CHAN
+        beq play_pulse1
+        lda #1
+        cmp PLAYER1_CHAN
+        beq play_pulse2
+        lda #2
+        cmp PLAYER1_CHAN
+        beq play_tri
+        lda #3
+        cmp PLAYER1_CHAN
+        beq play_noise
+        lda #4
+        cmp PLAYER1_CHAN
+        beq play_dmc
 
+        rts
+    .endproc
+
+    .proc change_channel
+        ;increment PLAYER1_CHAN to increase channel selection
+        lda #4
+        cmp PLAYER1_CHAN
+        beq reset_channel
+        ldx PLAYER1_CHAN
+        inx
+        stx PLAYER1_CHAN
+        rts
     reset_channel:
         lda #0
-        sta $22
-        jsr loop
+        sta PLAYER1_CHAN
+        rts
         
     .endproc
 
@@ -82,7 +72,7 @@
         sta $4002
         lda #%1111011
         sta $4003
-        jsr loop
+        rts
     .endproc
 
     .proc play_pulse2
@@ -94,7 +84,7 @@
         sta $4006
         lda #%1111011
         sta $4007
-        jsr loop
+        rts
     .endproc
 
     .proc play_tri
@@ -107,7 +97,7 @@
         sta $400A
         lda #%1111111
         sta $400B
-        jsr loop
+        rts
     .endproc
 
     .proc play_noise
@@ -120,13 +110,13 @@
         sta $400E
         lda #%1111011
         sta $400F
-        jsr loop
+        rts
     .endproc
 
     .proc play_dmc
         ;NOT IMPLEMENTED
         lda #%00000000
         sta $4015
-        jsr loop
+        rts
     .endproc
 .endscope

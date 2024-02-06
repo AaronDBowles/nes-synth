@@ -2,8 +2,8 @@
 
 .include "util/read_controller.s"
 
-PLAYER1_CHAN = $22
-PLAYER1_SOUND = $23
+PLAYER1_CHAN = $23
+PLAYER1_SOUND = $24
 
     .proc loop
     free_synth:
@@ -11,18 +11,50 @@ PLAYER1_SOUND = $23
         
     parse_inputs:
         ;determine if channel is being incremented with B press
-        lda Joypad::pressed
-        and #BUTTON_B
-        bne change_channel
+        lda #BUTTON_B
+        and Joypad::pressed
+        cmp #BUTTON_B
+        beq change_channel
         ;if A, play sound
-        ; lda #%10000000
-        ; and CONTROLLER1_INPUT
-        ; cmp #%10000000
-        ; beq play_sound
-
+        lda #BUTTON_A
+        and Joypad::pressed
+        cmp #BUTTON_A
+        beq play_sound
+        ;if up, increase pitch
+        lda #BUTTON_UP
+        and Joypad::pressed
+        cmp #BUTTON_UP
+        beq increase_pitch
+        ;if down, decrease pitch
+        lda #BUTTON_DOWN
+        and Joypad::pressed
+        cmp #BUTTON_DOWN
+        beq decrease_pitch
         rts
     
 
+    .endproc
+
+    .proc increase_pitch
+        ldx #255
+        cpx PLAYER1_SOUND
+        beq return
+        ldx PLAYER1_SOUND
+        inx
+        stx PLAYER1_SOUND
+    return:
+        rts
+    .endproc
+
+    .proc decrease_pitch
+        ldx #8
+        cpx PLAYER1_SOUND
+        beq return
+        ldx PLAYER1_SOUND
+        dex
+        stx PLAYER1_SOUND
+    return:
+        rts
     .endproc
 
     .proc play_sound
@@ -68,9 +100,9 @@ PLAYER1_SOUND = $23
         sta $4015
         lda #%11111100
         sta $4000
-        lda #%0001111
+        lda #PLAYER1_SOUND
         sta $4002
-        lda #%1111011
+        lda #%11110011
         sta $4003
         rts
     .endproc
@@ -80,9 +112,9 @@ PLAYER1_SOUND = $23
         sta $4015
         lda #%1111100
         sta $4004
-        lda #%0001111
+        lda #PLAYER1_SOUND
         sta $4006
-        lda #%1111011
+        lda #%11110011
         sta $4007
         rts
     .endproc
@@ -93,9 +125,9 @@ PLAYER1_SOUND = $23
         sta $4015
         lda #%11111100
         sta $4008
-        lda #%0111111
+        lda #PLAYER1_SOUND
         sta $400A
-        lda #%1111111
+        lda #%11110011
         sta $400B
         rts
     .endproc
@@ -106,7 +138,7 @@ PLAYER1_SOUND = $23
         sta $4015
         lda #%11111100
         sta $400C
-        lda #%0001111
+        lda #PLAYER1_SOUND
         sta $400E
         lda #%1111011
         sta $400F
